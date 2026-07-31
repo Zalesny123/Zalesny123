@@ -1,0 +1,661 @@
+name: Refresh profile assets
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/profile-assets.yml
+  workflow_dispatch:
+
+concurrency:
+  group: profile-assets
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Prepare candidate directory
+        run: mkdir -p generated
+
+      - name: Generate GitHub stats candidate
+        continue-on-error: true
+        uses: vn7n24fzkq/github-profile-summary-cards@eda120aff352e7438ecf2b3a67e7eda2deb9fe2a
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          USERNAME: ${{ github.repository_owner }}
+          BRANCH_NAME: main
+          AUTO_PUSH: false
+          THEME: radical
+          ANIMATION: none
+
+      - name: Apply profile palette to stats candidate
+        shell: python
+        run: |
+          import re
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          candidate = Path("profile-summary-card-output/radical/3-stats.svg")
+
+          if not candidate.exists():
+              print("::warning::Stats candidate was not generated.")
+              raise SystemExit(0)
+
+          ET.register_namespace("", "http://www.w3.org/2000/svg")
+          tree = ET.parse(candidate)
+          root = tree.getroot()
+
+          def set_style_fill(element, color):
+              style = element.get("style", "")
+
+              if re.search(r"fill:\s*#[0-9a-f]{6}", style, flags=re.IGNORECASE):
+                  style = re.sub(
+                      r"fill:\s*#[0-9a-f]{6}",
+                      f"fill: {color}",
+                      style,
+                      flags=re.IGNORECASE,
+                  )
+              else:
+                  style = f"{style.rstrip()} fill: {color};".lstrip()
+
+              element.set("style", style)
+
+          for element in root.iter():
+              local_name = element.tag.rsplit("}", 1)[-1].lower()
+
+              if local_name == "rect":
+                  element.set("fill", "#0D1117")
+
+                  if element.get("stroke") not in {None, "", "none"}:
+                      element.set("stroke", "#FF6A00")
+              elif local_name == "g":
+                  if element.get("fill") not in {None, "", "none"}:
+                      element.set("fill", "#FF6A00")
+
+                  if "fill:" in element.get("style", "").lower():
+                      set_style_fill(element, "#FF6A00")
+              elif local_name == "text":
+                  label = "".join(element.itertext()).strip()
+                  normalized = "".join(label.split())
+
+                  if normalized == "Stats":
+                      set_style_fill(element, "#FF6A00")
+                  elif label.endswith(":"):
+                      set_style_fill(element, "#FDBA74")
+                  elif normalized.isdigit():
+                      set_style_fill(element, "#FFFFFF")
+
+          tree.write(candidate, encoding="utf-8", xml_declaration=False)
+
+      - name: Fetch themed streak candidate
+        continue-on-error: true
+        run: |
+          curl --fail --location --silent --show-error \
+            --retry 3 --retry-all-errors \
+            --output generated/github-streak.svg \
+            "https://streak-stats.demolab.com/?user=${{ github.repository_owner }}&card_width=340&background=0D1117&border=FF6A00&stroke=EA580C&ring=EF4444&fire=FF6A00&currStreakNum=FFFFFF&sideNums=FFFFFF&currStreakLabel=FF6A00&sideLabels=FF6A00&dates=FDBA74&hide_border=false&disable_animations=true"
+
+      - name: Apply profile gradient to streak candidate
+        shell: python
+        run: |
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          candidate = Path("generated/github-streak.svg")
+
+          if not candidate.exists():
+              print("::warning::Streak candidate was not generated.")
+              raise SystemExit(0)
+
+          ET.register_namespace("", "http://www.w3.org/2000/svg")
+          ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+          tree = ET.parse(candidate)
+          root = tree.getroot()
+          namespace = "{http://www.w3.org/2000/svg}"
+          definitions = root.find(f"{namespace}defs")
+
+          if definitions is None:
+              definitions = ET.Element(f"{namespace}defs")
+              root.insert(0, definitions)
+
+          for existing in list(definitions):
+              if existing.get("id") == "fire_ring":
+                  definitions.remove(existing)
+
+          gradient = ET.SubElement(
+              definitions,
+              f"{namespace}linearGradient",
+              {"id": "fire_ring", "x1": "0%", "y1": "0%", "x2": "100%", "y2": "100%"},
+          )
+
+          for offset, color in (
+              ("0%", "#EF4444"),
+              ("50%", "#FF6A00"),
+              ("100%", "#FACC15"),
+          ):
+              ET.SubElement(
+                  gradient,
+                  f"{namespace}stop",
+                  {"offset": offset, "stop-color": color},
+              )
+
+          for element in root.iter():
+              local_name = element.tag.rsplit("}", 1)[-1].lower()
+
+              if local_name == "rect" and element.get("stroke") not in {None, "", "none"}:
+                  element.set("stroke", "#FF6A00")
+              elif local_name == "line":
+                  element.set("stroke", "#EA580C")
+              elif local_name == "circle" and element.get("stroke") not in {None, "", "none"}:
+                  element.set("stroke", "url(#fire_ring)")
+              elif local_name == "path" and element.get("fill") not in {None, "", "none"}:
+                  element.set("fill", "#FF6A00")
+              elif local_name == "text":
+                  label = "".join(element.itertext()).strip()
+                  normalized = "".join(label.split()).lower()
+
+                  if normalized.isdigit():
+                      element.set("fill", "#FFFFFF")
+                  elif normalized in {
+                      "totalcontributions",
+                      "currentstreak",
+                      "longeststreak",
+                  }:
+                      element.set("fill", "#FF6A00")
+                  elif "present" in normalized or "-" in label:
+                      element.set("fill", "#FDBA74")
+
+          tree.write(candidate, encoding="utf-8", xml_declaration=False)
+
+      - name: Upload candidates
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: profile-asset-candidates
+          path: |
+            profile-summary-card-output/radical/3-stats.svg
+            generated/github-streak.svg
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    needs: generate
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download candidates
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: profile-asset-candidates
+          path: candidates
+
+      - name: Validate and promote candidates
+        id: promote
+        shell: python
+        run: |
+          import os
+          import re
+          import shutil
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          candidates = [
+              (
+                  "stats",
+                  Path("candidates/profile-summary-card-output/radical/3-stats.svg"),
+                  Path("assets/github-stats.svg"),
+                  (
+                      "Stats",
+                      "Total Stars:",
+                      "Total Commits:",
+                      "Total PRs:",
+                      "Total Issues:",
+                      "Contributed to:",
+                  ),
+                  ("#0d1117", "#ff6a00", "#fdba74", "#ffffff"),
+                  ("340", "200", "0 0 340 200"),
+              ),
+              (
+                  "streak",
+                  Path("candidates/generated/github-streak.svg"),
+                  Path("assets/github-streak.svg"),
+                  (
+                      "Total Contributions",
+                      "Current Streak",
+                      "Longest Streak",
+                  ),
+                  (
+                      "#ef4444",
+                      "#ff6a00",
+                      "#ea580c",
+                      "#facc15",
+                      "#fdba74",
+                      "#ffffff",
+                      "#0d1117",
+                  ),
+                  ("340px", "195px", "0 0 340 195"),
+              ),
+          ]
+
+          rejected_fragments = (
+              "<!doctype",
+              "<!entity",
+              "javascript:",
+              "data:",
+              "@import",
+              "<?xml-stylesheet",
+              "something went wrong",
+              "bad credentials",
+              "rate limit exceeded",
+          )
+          rejected_elements = {
+              "embed",
+              "animate",
+              "animatemotion",
+              "animatetransform",
+              "foreignobject",
+              "iframe",
+              "image",
+              "object",
+              "script",
+              "set",
+          }
+
+          failed = []
+          updated = []
+
+          for (
+              name,
+              candidate,
+              destination,
+              markers,
+              expected_colors,
+              expected_dimensions,
+          ) in candidates:
+              try:
+                  data = candidate.read_bytes()
+
+                  if not 1_500 <= len(data) <= 1_000_000:
+                      raise ValueError(f"unexpected size: {len(data)} bytes")
+
+                  text = data.decode("utf-8")
+                  lowered = text.lower()
+
+                  if any(fragment in lowered for fragment in rejected_fragments):
+                      raise ValueError("rejected content found")
+
+                  if re.search(r"url\(\s*['\"]?(?!#)", lowered):
+                      raise ValueError("external CSS resource found")
+
+                  root = ET.fromstring(data)
+                  normalized_rendered_text = "".join(
+                      "".join(root.itertext()).split()
+                  )
+
+                  if root.tag.rsplit("}", 1)[-1].lower() != "svg":
+                      raise ValueError("root element is not SVG")
+
+                  expected_width, expected_height, expected_view_box = (
+                      expected_dimensions
+                  )
+
+                  if (
+                      root.get("width") != expected_width
+                      or root.get("height") != expected_height
+                      or root.get("viewBox") != expected_view_box
+                  ):
+                      raise ValueError(
+                          "unexpected dimensions: "
+                          f"width={root.get('width')}, "
+                          f"height={root.get('height')}, "
+                          f"viewBox={root.get('viewBox')}"
+                      )
+
+                  if any(
+                      root.get(attribute)
+                      for attribute in (
+                          "clip-path",
+                          "display",
+                          "filter",
+                          "mask",
+                          "opacity",
+                          "transform",
+                          "visibility",
+                      )
+                  ):
+                      raise ValueError("root SVG presentation override found")
+
+                  for element in root.iter():
+                      local_name = element.tag.rsplit("}", 1)[-1].lower()
+
+                      if local_name in rejected_elements:
+                          raise ValueError(f"rejected element: {local_name}")
+
+                      if local_name == "style":
+                          stylesheet = "".join(element.itertext())
+
+                          if not re.fullmatch(
+                              r"\s*\*\s*\{\s*font-family\s*:[^{};]+;?\s*\}\s*",
+                              stylesheet,
+                              flags=re.IGNORECASE,
+                          ):
+                              raise ValueError("unsupported stylesheet content")
+
+                      for attribute, value in element.attrib.items():
+                          attribute_name = attribute.rsplit("}", 1)[-1].lower()
+                          value_lowered = value.strip().lower()
+
+                          if attribute_name.startswith("on"):
+                              raise ValueError(
+                                  f"event attribute found: {attribute_name}"
+                              )
+
+                          if attribute_name == "filter":
+                              raise ValueError("SVG filters are forbidden")
+
+                          if attribute_name in {"display", "visibility"}:
+                              raise ValueError(
+                                  f"SVG {attribute_name} overrides are forbidden"
+                              )
+
+                          if attribute_name in {"fill-opacity", "opacity"}:
+                              if value_lowered != "1":
+                                  raise ValueError(
+                                      f"invalid {attribute_name} value"
+                                  )
+
+                          if attribute_name == "stroke-opacity" and value_lowered not in {"0", "1"}:
+                              raise ValueError("invalid stroke-opacity value")
+
+                          if attribute_name in {"href", "src"} and not value_lowered.startswith("#"):
+                              raise ValueError(
+                                  f"external reference found: {attribute_name}"
+                              )
+
+                          if attribute_name == "style":
+                              if any(
+                                  token in value
+                                  for token in ("/*", "*/", "\\", "{", "}", "@")
+                              ):
+                                  raise ValueError("unsupported inline style syntax")
+
+                              for declaration in value.split(";"):
+                                  if ":" not in declaration:
+                                      continue
+
+                                  property_name, property_value = declaration.split(":", 1)
+                                  property_name = property_name.strip().lower()
+                                  property_value = property_value.strip().lower()
+
+                                  if property_name not in {
+                                      "--gpsc-i",
+                                      "fill",
+                                      "font-size",
+                                      "isolation",
+                                      "opacity",
+                                  }:
+                                      raise ValueError(
+                                          f"unsupported inline property: {property_name}"
+                                      )
+
+                                  if property_name == "--gpsc-i" and not re.fullmatch(
+                                      r"\d+", property_value
+                                  ):
+                                      raise ValueError("invalid --gpsc-i value")
+
+                                  if property_name == "font-size" and not re.fullmatch(
+                                      r"\d+(?:\.\d+)?px", property_value
+                                  ):
+                                      raise ValueError("invalid inline font-size")
+
+                                  if property_name == "isolation" and property_value != "isolate":
+                                      raise ValueError("invalid isolation value")
+
+                                  if property_name == "opacity" and property_value != "1":
+                                      raise ValueError("invalid opacity value")
+
+                                  if property_name not in {
+                                      "color",
+                                      "fill",
+                                      "stop-color",
+                                      "stroke",
+                                  }:
+                                      continue
+
+                                  if "!important" in property_value or not re.fullmatch(
+                                      r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent",
+                                      property_value,
+                                  ):
+                                      raise ValueError(
+                                          f"unsupported inline {property_name} value"
+                                      )
+
+                          if attribute_name in {"color", "fill", "stop-color", "stroke"}:
+                              if not re.fullmatch(
+                                  r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent",
+                                  value_lowered,
+                              ):
+                                  raise ValueError(
+                                      f"unsupported {attribute_name} value"
+                                  )
+
+                  missing = [
+                      marker
+                      for marker in markers
+                      if "".join(marker.split()) not in normalized_rendered_text
+                  ]
+                  if missing:
+                      raise ValueError(f"missing markers: {', '.join(missing)}")
+
+                  missing_colors = [
+                      color for color in expected_colors if color not in lowered
+                  ]
+                  if missing_colors:
+                      raise ValueError(
+                          f"missing profile colors: {', '.join(missing_colors)}"
+                      )
+
+                  svg_colors = set(
+                      re.findall(r"#[0-9a-f]{6}", lowered)
+                  )
+                  unexpected_colors = sorted(
+                      svg_colors.difference(expected_colors)
+                  )
+
+                  if unexpected_colors:
+                      raise ValueError(
+                          f"unexpected colors: {', '.join(unexpected_colors)}"
+                      )
+
+                  def color_of(element, property_name):
+                      inline_values = []
+
+                      for declaration in element.get("style", "").split(";"):
+                          if ":" not in declaration:
+                              continue
+
+                          declared_property, declared_value = declaration.split(":", 1)
+                          if declared_property.strip().lower() == property_name:
+                              inline_values.append(declared_value.strip().lower())
+
+                      if inline_values:
+                          return inline_values[-1]
+
+                      direct_color = element.get(property_name)
+                      return direct_color.lower() if direct_color else None
+
+                  def normalized_label(element):
+                      return "".join(
+                          "".join(element.itertext()).split()
+                      ).lower()
+
+                  elements = list(root.iter())
+                  texts = [
+                      element
+                      for element in elements
+                      if element.tag.rsplit("}", 1)[-1].lower() == "text"
+                  ]
+                  border = next(
+                      (
+                          element
+                          for element in elements
+                          if element.tag.rsplit("}", 1)[-1].lower() == "rect"
+                          and color_of(element, "stroke") not in {None, "none"}
+                      ),
+                      None,
+                  )
+
+                  if border is None:
+                      raise ValueError("card border not found")
+
+                  if (
+                      color_of(border, "fill") != "#0d1117"
+                      or color_of(border, "stroke") != "#ff6a00"
+                      or border.get("stroke-opacity") not in {None, "", "1"}
+                  ):
+                      raise ValueError("card border palette mismatch")
+
+                  if name == "stats":
+                      for element in texts:
+                          label = normalized_label(element)
+                          actual_color = color_of(element, "fill")
+
+                          if label == "stats" and actual_color != "#ff6a00":
+                              raise ValueError("stats title color mismatch")
+                          if label.endswith(":") and actual_color != "#fdba74":
+                              raise ValueError("stats label color mismatch")
+                          if label.isdigit() and actual_color != "#ffffff":
+                              raise ValueError("stats value color mismatch")
+
+                  if name == "streak":
+                      gradient = next(
+                          (
+                              element
+                              for element in elements
+                              if element.get("id") == "fire_ring"
+                          ),
+                          None,
+                      )
+
+                      if gradient is None or (
+                          gradient.get("x1"),
+                          gradient.get("y1"),
+                          gradient.get("x2"),
+                          gradient.get("y2"),
+                      ) != ("0%", "0%", "100%", "100%"):
+                          raise ValueError("streak gradient direction mismatch")
+
+                      stop_colors = [
+                          color_of(element, "stop-color")
+                          for element in list(gradient)
+                      ]
+                      if stop_colors != ["#ef4444", "#ff6a00", "#facc15"]:
+                          raise ValueError("streak gradient palette mismatch")
+
+                      lines = [
+                          element
+                          for element in elements
+                          if element.tag.rsplit("}", 1)[-1].lower() == "line"
+                      ]
+                      if not lines or any(
+                          color_of(element, "stroke") != "#ea580c"
+                          for element in lines
+                      ):
+                          raise ValueError("streak divider color mismatch")
+
+                      circles = [
+                          element
+                          for element in elements
+                          if element.tag.rsplit("}", 1)[-1].lower() == "circle"
+                          and color_of(element, "stroke") not in {None, "none"}
+                      ]
+                      if len(circles) != 1 or color_of(circles[0], "stroke") != "url(#fire_ring)":
+                          raise ValueError("streak ring gradient is missing")
+
+                      for element in texts:
+                          label = normalized_label(element)
+                          actual_color = color_of(element, "fill")
+
+                          if label.isdigit() and actual_color != "#ffffff":
+                              raise ValueError("streak value color mismatch")
+                          if label in {
+                              "totalcontributions",
+                              "currentstreak",
+                              "longeststreak",
+                          } and actual_color != "#ff6a00":
+                              raise ValueError("streak label color mismatch")
+                          if (
+                              "present" in label or "-" in label
+                          ) and actual_color != "#fdba74":
+                              raise ValueError("streak date color mismatch")
+
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+
+                  if not destination.exists() or destination.read_bytes() != data:
+                      shutil.copyfile(candidate, destination)
+                      updated.append(name)
+                      print(f"Promoted {name}: {candidate} -> {destination}")
+                  else:
+                      print(f"{name} is already current")
+
+              except Exception as error:
+                  failed.append(name)
+                  print(
+                      f"::warning title={name} asset preserved::"
+                      f"Candidate rejected: {error}"
+                  )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"updated={','.join(updated)}", file=output)
+              print(f"failed={','.join(failed)}", file=output)
+
+      - name: Remove candidates
+        if: always()
+        run: rm -rf candidates
+
+      - name: Commit valid asset updates
+        run: |
+          if git diff --quiet -- assets/github-stats.svg assets/github-streak.svg; then
+            echo "No asset changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- assets/github-stats.svg assets/github-streak.svg
+
+          if git diff --cached --quiet; then
+            echo "No staged asset changes."
+            exit 0
+          fi
+
+          git commit -m "chore: refresh profile assets"
+          git push
+
+      - name: Report stale assets
+        if: steps.promote.outputs.failed != ''
+        run: |
+          echo "::error::One or more candidates failed validation. Last valid assets were preserved: ${{ steps.promote.outputs.failed }}"
+          exit 1
