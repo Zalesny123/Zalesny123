@@ -96,6 +96,10 @@ The application was developed as my engineering thesis and received a distinctio
 </p>
 
 <p align="center">
+  <img src="https://github-stats-extended.vercel.app/api/top-langs/?username=Zalesny123&layout=compact&title_color=FF6A00&text_color=FFFFFF&bg_color=0D1117&border_color=FF6A00" width="400" alt="Most used languages compact">
+</p>
+
+<p align="center">
   <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Zalesny123&amp;theme=github_dark&amp;animation=load&amp;title_color=FF6A00&amp;text_color=FFFFFF&amp;bg_color=0D1117&amp;border_color=FF6A00&amp;icon_color=FF6A00&amp;chart_color=EF4444" width="100%" alt="Profile details and activity timeline for Zalesny123">
 </p>
 
