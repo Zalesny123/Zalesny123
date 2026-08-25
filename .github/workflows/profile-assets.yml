@@ -296,19 +296,20 @@ jobs:
 
               width = 840
               height = 360
-              margin_left = 60
+              margin_left = 65
               margin_right = 40
-              margin_top = 70
+              margin_top = 80
               margin_bottom = 50
 
               plot_w = width - margin_left - margin_right
               plot_h = height - margin_top - margin_bottom
 
-              max_val = max(d["contributionCount"] for d in last_31)
-              if max_val < 5:
-                  max_val = 5
-              else:
-                  max_val = math.ceil(max_val / 5) * 5
+              raw_max = max(d["contributionCount"] for d in last_31)
+              raw_max = max(raw_max, 4)
+              step_val = math.ceil(raw_max / 4)
+              max_val = step_val * 4
+
+              total_last_31 = sum(d["contributionCount"] for d in last_31)
 
               def x_for(i):
                   return margin_left + (i / (len(last_31) - 1)) * plot_w
@@ -333,31 +334,35 @@ jobs:
               svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}">
                 <defs>
                   <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#EF4444" stop-opacity="0.5"/>
-                    <stop offset="100%" stop-color="#FF6A00" stop-opacity="0.05"/>
+                    <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"/>
+                    <stop offset="45%" stop-color="#FF6A00" stop-opacity="0.45"/>
+                    <stop offset="100%" stop-color="#0D1117" stop-opacity="0.05"/>
                   </linearGradient>
                   <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#EF4444"/>
+                    <stop offset="0%" stop-color="#8B5CF6"/>
                     <stop offset="50%" stop-color="#FF6A00"/>
-                    <stop offset="100%" stop-color="#FDBA74"/>
+                    <stop offset="100%" stop-color="#EF4444"/>
                   </linearGradient>
                 </defs>
 
                 <!-- Background -->
                 <rect width="{width}" height="{height}" rx="6" fill="#0D1117" stroke="#FF6A00" stroke-width="1.5"/>
 
-                <!-- Title -->
-                <text x="{margin_left}" y="42" fill="#FF6A00" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600">
+                <!-- Title & Subtitle -->
+                <text x="{margin_left}" y="38" fill="#FF6A00" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600">
                   ${{ github.repository_owner }} GitHub Activity
+                </text>
+                <text x="{margin_left}" y="58" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12">
+                  Daily Contributions (Last 31 Days · Total: {total_last_31})
                 </text>
               """
 
               grid_steps = 4
               for step in range(grid_steps + 1):
-                  val = (max_val / grid_steps) * step
+                  val = step * step_val
                   y = margin_top + plot_h - (step / grid_steps) * plot_h
                   svg += f"""  <line x1="{margin_left}" y1="{y:.1f}" x2="{width - margin_right}" y2="{y:.1f}" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-                <text x="{margin_left - 12}" y="{y + 4:.1f}" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">{int(val)}</text>
+                <text x="{margin_left - 12}" y="{y + 4:.1f}" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">{val}</text>
               """
 
               svg += f"""  <path d="{area_d}" fill="url(#areaGradient)"/>
@@ -476,6 +481,7 @@ jobs:
                   (
                       "#ef4444",
                       "#ff6a00",
+                      "#8b5cf6",
                       "#fdba74",
                       "#ffffff",
                       "#0d1117",
@@ -696,7 +702,7 @@ jobs:
                                       continue
 
                                   if "!important" in property_value or not re.fullmatch(
-                                      r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent",
+                                      r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent|currentcolor",
                                       property_value,
                                   ):
                                       raise ValueError(
@@ -705,7 +711,7 @@ jobs:
 
                           if attribute_name in {"color", "fill", "stop-color", "stroke"}:
                               if not re.fullmatch(
-                                  r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent",
+                                  r"#[0-9a-f]{6}|url\(#[a-z0-9_-]+\)|black|none|white|transparent|currentcolor",
                                   value_lowered,
                               ):
                                   raise ValueError(
