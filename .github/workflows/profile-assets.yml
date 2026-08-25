@@ -103,6 +103,7 @@ jobs:
       - name: Apply profile palette and gradient to details candidate
         shell: python
         run: |
+          import re
           from pathlib import Path
           from xml.etree import ElementTree as ET
 
@@ -131,19 +132,39 @@ jobs:
           ET.SubElement(gradient, f"{namespace}stop", {"offset": "50%", "stop-color": "#FF6A00", "stop-opacity": "0.65"})
           ET.SubElement(gradient, f"{namespace}stop", {"offset": "100%", "stop-color": "#EF4444", "stop-opacity": "0.1"})
 
+          def set_style_prop(element, prop, value):
+              style = element.get("style", "")
+              if re.search(rf"{prop}:\s*[^;]+", style, flags=re.IGNORECASE):
+                  style = re.sub(rf"{prop}:\s*[^;]+", f"{prop}: {value}", style, flags=re.IGNORECASE)
+              else:
+                  style = f"{style.rstrip()} {prop}: {value};".lstrip()
+              element.set("style", style)
+
           for element in root.iter():
               local_name = element.tag.rsplit("}", 1)[-1].lower()
               elem_class = element.get("class", "")
 
-              if "gpsc-chart" in elem_class:
+              if local_name == "rect":
+                  if element.get("stroke") not in {None, "", "none"}:
+                      element.set("stroke", "#FF6A00")
+                      element.set("fill", "#0D1117")
+              elif "gpsc-chart" in elem_class:
                   for child in element:
                       if child.tag.rsplit("}", 1)[-1].lower() == "path":
                           child.set("fill", "url(#chart_gradient)")
                           child.set("stroke", "#FF6A00")
-                          child.set("stroke-width", "1.5")
-              elif local_name == "rect" and element.get("stroke") not in {None, "", "none"}:
-                  element.set("stroke", "#FF6A00")
-                  element.set("fill", "#0D1117")
+                          child.set("stroke-width", "2")
+              elif local_name == "g":
+                  if element.get("color") not in {None, "", "none"}:
+                      element.set("color", "#FFFFFF")
+                  if element.get("fill") not in {None, "", "none"}:
+                      element.set("fill", "#FF6A00")
+              elif local_name == "text":
+                  label = "".join(element.itertext()).strip()
+                  if label == "${{ github.repository_owner }}":
+                      set_style_prop(element, "fill", "#FF6A00")
+                  else:
+                      set_style_prop(element, "fill", "#FFFFFF")
 
           tree.write(candidate, encoding="utf-8", xml_declaration=False)
 
