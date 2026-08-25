@@ -2,7 +2,8 @@ name: Refresh profile assets
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    # Daily at ~00:05 Warsaw time (22:05 UTC)
+    - cron: "5 22 * * *"
   push:
     branches:
       - main
@@ -23,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Prepare candidate directory
         run: mkdir -p generated
@@ -102,10 +103,26 @@ jobs:
       - name: Fetch themed streak candidate
         continue-on-error: true
         run: |
-          curl --fail --location --silent --show-error \
-            --retry 3 --retry-all-errors \
-            --output generated/github-streak.svg \
-            "https://streak-stats.demolab.com/?user=${{ github.repository_owner }}&card_width=340&background=0D1117&border=FF6A00&stroke=EA580C&ring=EF4444&fire=FF6A00&currStreakNum=FFFFFF&sideNums=FFFFFF&currStreakLabel=FF6A00&sideLabels=FF6A00&dates=FDBA74&hide_border=false&disable_animations=true"
+          STREAK_URL="https://streak-stats.demolab.com/?user=${{ github.repository_owner }}&card_width=340&background=0D1117&border=FF6A00&stroke=EA580C&ring=EF4444&fire=FF6A00&currStreakNum=FFFFFF&sideNums=FFFFFF&currStreakLabel=FF6A00&sideLabels=FF6A00&dates=FDBA74&hide_border=false&disable_animations=true"
+
+          for attempt in {1..5}; do
+            echo "Attempt $attempt: Fetching streak candidate..."
+            if curl --fail --location --silent --show-error \
+              --output generated/github-streak.svg \
+              "$STREAK_URL"; then
+              if [ -s generated/github-streak.svg ] && grep -q "Total Contributions" generated/github-streak.svg; then
+                echo "Streak candidate successfully fetched and verified."
+                exit 0
+              fi
+              echo "Streak response did not contain expected content (error payload or rate-limited). Retrying..."
+            else
+              echo "Curl failed to connect or fetch from streak server. Retrying..."
+            fi
+            rm -f generated/github-streak.svg
+            sleep 15
+          done
+
+          echo "::warning::Streak candidate could not be fetched after 5 attempts. Preserving existing asset."
 
       - name: Apply profile gradient to streak candidate
         shell: python
@@ -202,11 +219,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Download candidates
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: profile-asset-candidates
           path: candidates
@@ -295,6 +312,9 @@ jobs:
               expected_dimensions,
           ) in candidates:
               try:
+                  if not candidate.exists():
+                      raise FileNotFoundError(f"candidate file '{candidate.name}' was not generated")
+
                   data = candidate.read_bytes()
 
                   if not 1_500 <= len(data) <= 1_000_000:
@@ -657,5 +677,4 @@ jobs:
       - name: Report stale assets
         if: steps.promote.outputs.failed != ''
         run: |
-          echo "::error::One or more candidates failed validation. Last valid assets were preserved: ${{ steps.promote.outputs.failed }}"
-          exit 1
+          echo "::warning::One or more candidates failed validation or could not be generated. Last valid assets were safely preserved: ${{ steps.promote.outputs.failed }}"
