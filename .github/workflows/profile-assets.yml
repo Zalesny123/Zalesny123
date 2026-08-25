@@ -410,6 +410,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Download candidates
         continue-on-error: true
@@ -895,7 +897,8 @@ jobs:
           fi
 
           git commit -m "chore: refresh profile assets"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
 
       - name: Report stale assets
         if: steps.promote.outputs.failed != ''
