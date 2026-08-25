@@ -656,6 +656,7 @@ jobs:
 
                                   if property_name not in {
                                       "--gpsc-i",
+                                      "--gpsc-w",
                                       "fill",
                                       "font-size",
                                       "isolation",
@@ -669,6 +670,11 @@ jobs:
                                       r"\d+", property_value
                                   ):
                                       raise ValueError("invalid --gpsc-i value")
+
+                                  if property_name == "--gpsc-w" and not re.fullmatch(
+                                      r"\d+(?:\.\d+)?px", property_value
+                                  ):
+                                      raise ValueError("invalid --gpsc-w value")
 
                                   if property_name == "font-size" and not re.fullmatch(
                                       r"\d+(?:\.\d+)?px", property_value
