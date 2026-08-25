@@ -100,7 +100,7 @@ The application was developed as my engineering thesis and received a distinctio
 </p>
 
 <p align="center">
-  <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Zalesny123&amp;theme=github_dark&amp;animation=load&amp;title_color=FF6A00&amp;text_color=FFFFFF&amp;bg_color=0D1117&amp;border_color=FF6A00&amp;icon_color=FF6A00&amp;chart_color=EF4444" width="100%" alt="Profile details and activity timeline for Zalesny123">
+  <img src="./assets/github-profile-details.svg" width="100%" alt="Profile details and activity timeline for Zalesny123">
 </p>
 
 <p align="center">
@@ -109,5 +109,5 @@ The application was developed as my engineering thesis and received a distinctio
 </p>
 
 <p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=Zalesny123&amp;bg_color=0D1117&amp;color=FFFFFF&amp;line=FF6A00&amp;point=EF4444&amp;area_color=EF4444&amp;title_color=FF6A00&amp;area=true&amp;hide_border=false&amp;border_color=FF6A00&amp;custom_title=Zalesny123%20GitHub%20Activity" width="100%" alt="Daily GitHub activity for Zalesny123">
+  <img src="./assets/github-activity-graph.svg" width="100%" alt="Daily GitHub activity for Zalesny123">
 </p>
