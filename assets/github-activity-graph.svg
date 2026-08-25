@@ -1,43 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 360" width="840" height="360">
-  <defs>
-    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"/>
-      <stop offset="45%" stop-color="#FF6A00" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#0D1117" stop-opacity="0.05"/>
-    </linearGradient>
-    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="50%" stop-color="#FF6A00"/>
-      <stop offset="100%" stop-color="#EF4444"/>
-    </linearGradient>
-  </defs>
+      <defs>
+        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"/>
+          <stop offset="45%" stop-color="#FF6A00" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#0D1117" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#8B5CF6"/>
+          <stop offset="50%" stop-color="#FF6A00"/>
+          <stop offset="100%" stop-color="#EF4444"/>
+        </linearGradient>
+      </defs>
 
-  <!-- Background -->
-  <rect width="840" height="360" rx="6" fill="#0D1117" stroke="#FF6A00" stroke-width="1.5"/>
+      <!-- Background -->
+      <rect width="840" height="360" rx="6" fill="#0D1117" stroke="#FF6A00" stroke-width="1.5"/>
 
-  <!-- Title & Subtitle -->
-  <text x="65" y="38" fill="#FF6A00" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600">
-    Zalesny123 GitHub Activity
-  </text>
-  <text x="65" y="58" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12">
-    Daily Contributions (Last 31 Days · Total: 19)
-  </text>
-  <line x1="65" y1="310.0" x2="800" y2="310.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="53" y="314.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">0</text>
-  <line x1="65" y1="252.5" x2="800" y2="252.5" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="53" y="256.5" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">3</text>
-  <line x1="65" y1="195.0" x2="800" y2="195.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="53" y="199.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">6</text>
-  <line x1="65" y1="137.5" x2="800" y2="137.5" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="53" y="141.5" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">9</text>
-  <line x1="65" y1="80.0" x2="800" y2="80.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="53" y="84.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">12</text>
-  <path d="M 65.0 310.0 C 77.2 310.0, 77.2 310.0, 89.5 310.0 C 101.8 310.0, 101.8 118.3, 114.0 118.3 C 126.2 118.3, 126.2 310.0, 138.5 310.0 C 150.8 310.0, 150.8 310.0, 163.0 310.0 C 175.2 310.0, 175.2 252.5, 187.5 252.5 C 199.8 252.5, 199.8 310.0, 212.0 310.0 C 224.2 310.0, 224.2 310.0, 236.5 310.0 C 248.8 310.0, 248.8 310.0, 261.0 310.0 C 273.2 310.0, 273.2 310.0, 285.5 310.0 C 297.8 310.0, 297.8 310.0, 310.0 310.0 C 322.2 310.0, 322.2 310.0, 334.5 310.0 C 346.8 310.0, 346.8 310.0, 359.0 310.0 C 371.2 310.0, 371.2 310.0, 383.5 310.0 C 395.8 310.0, 395.8 310.0, 408.0 310.0 C 420.2 310.0, 420.2 310.0, 432.5 310.0 C 444.8 310.0, 444.8 271.7, 457.0 271.7 C 469.2 271.7, 469.2 310.0, 481.5 310.0 C 493.8 310.0, 493.8 310.0, 506.0 310.0 C 518.2 310.0, 518.2 310.0, 530.5 310.0 C 542.8 310.0, 542.8 310.0, 555.0 310.0 C 567.2 310.0, 567.2 310.0, 579.5 310.0 C 591.8 310.0, 591.8 310.0, 604.0 310.0 C 616.2 310.0, 616.2 310.0, 628.5 310.0 C 640.8 310.0, 640.8 310.0, 653.0 310.0 C 665.2 310.0, 665.2 310.0, 677.5 310.0 C 689.8 310.0, 689.8 310.0, 702.0 310.0 C 714.2 310.0, 714.2 310.0, 726.5 310.0 C 738.8 310.0, 738.8 310.0, 751.0 310.0 C 763.2 310.0, 763.2 310.0, 775.5 310.0 C 787.8 310.0, 787.8 233.3, 800.0 233.3 L 800.0 310.0 L 65.0 310.0 Z" fill="url(#areaGradient)"/>
-  <path d="M 65.0 310.0 C 77.2 310.0, 77.2 310.0, 89.5 310.0 C 101.8 310.0, 101.8 118.3, 114.0 118.3 C 126.2 118.3, 126.2 310.0, 138.5 310.0 C 150.8 310.0, 150.8 310.0, 163.0 310.0 C 175.2 310.0, 175.2 252.5, 187.5 252.5 C 199.8 252.5, 199.8 310.0, 212.0 310.0 C 224.2 310.0, 224.2 310.0, 236.5 310.0 C 248.8 310.0, 248.8 310.0, 261.0 310.0 C 273.2 310.0, 273.2 310.0, 285.5 310.0 C 297.8 310.0, 297.8 310.0, 310.0 310.0 C 322.2 310.0, 322.2 310.0, 334.5 310.0 C 346.8 310.0, 346.8 310.0, 359.0 310.0 C 371.2 310.0, 371.2 310.0, 383.5 310.0 C 395.8 310.0, 395.8 310.0, 408.0 310.0 C 420.2 310.0, 420.2 310.0, 432.5 310.0 C 444.8 310.0, 444.8 271.7, 457.0 271.7 C 469.2 271.7, 469.2 310.0, 481.5 310.0 C 493.8 310.0, 493.8 310.0, 506.0 310.0 C 518.2 310.0, 518.2 310.0, 530.5 310.0 C 542.8 310.0, 542.8 310.0, 555.0 310.0 C 567.2 310.0, 567.2 310.0, 579.5 310.0 C 591.8 310.0, 591.8 310.0, 604.0 310.0 C 616.2 310.0, 616.2 310.0, 628.5 310.0 C 640.8 310.0, 640.8 310.0, 653.0 310.0 C 665.2 310.0, 665.2 310.0, 677.5 310.0 C 689.8 310.0, 689.8 310.0, 702.0 310.0 C 714.2 310.0, 714.2 310.0, 726.5 310.0 C 738.8 310.0, 738.8 310.0, 751.0 310.0 C 763.2 310.0, 763.2 310.0, 775.5 310.0 C 787.8 310.0, 787.8 233.3, 800.0 233.3" fill="none" stroke="url(#lineGradient)" stroke-width="2.5"/>
-  <circle cx="65.0" cy="310.0" r="2.5" fill="#30363D"/>
+      <!-- Title & Subtitle -->
+      <text x="65" y="38" fill="#FF6A00" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600">
+        Zalesny123 GitHub Activity
+      </text>
+      <text x="65" y="58" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12">
+        Daily Contributions (Last 31 Days · Total: 19)
+      </text>
+      <line x1="65" y1="310.0" x2="800" y2="310.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="53" y="314.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">0</text>
+      <line x1="65" y1="252.5" x2="800" y2="252.5" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="53" y="256.5" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">3</text>
+      <line x1="65" y1="195.0" x2="800" y2="195.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="53" y="199.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">6</text>
+      <line x1="65" y1="137.5" x2="800" y2="137.5" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="53" y="141.5" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">9</text>
+      <line x1="65" y1="80.0" x2="800" y2="80.0" stroke="#30363D" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="53" y="84.0" text-anchor="end" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">12</text>
+      <path d="M 65.0 310.0 C 77.2 310.0, 77.2 290.8, 89.5 290.8 C 101.8 290.8, 101.8 137.5, 114.0 137.5 C 126.2 137.5, 126.2 310.0, 138.5 310.0 C 150.8 310.0, 150.8 310.0, 163.0 310.0 C 175.2 310.0, 175.2 252.5, 187.5 252.5 C 199.8 252.5, 199.8 310.0, 212.0 310.0 C 224.2 310.0, 224.2 310.0, 236.5 310.0 C 248.8 310.0, 248.8 310.0, 261.0 310.0 C 273.2 310.0, 273.2 310.0, 285.5 310.0 C 297.8 310.0, 297.8 310.0, 310.0 310.0 C 322.2 310.0, 322.2 310.0, 334.5 310.0 C 346.8 310.0, 346.8 310.0, 359.0 310.0 C 371.2 310.0, 371.2 310.0, 383.5 310.0 C 395.8 310.0, 395.8 310.0, 408.0 310.0 C 420.2 310.0, 420.2 310.0, 432.5 310.0 C 444.8 310.0, 444.8 271.7, 457.0 271.7 C 469.2 271.7, 469.2 310.0, 481.5 310.0 C 493.8 310.0, 493.8 310.0, 506.0 310.0 C 518.2 310.0, 518.2 310.0, 530.5 310.0 C 542.8 310.0, 542.8 310.0, 555.0 310.0 C 567.2 310.0, 567.2 310.0, 579.5 310.0 C 591.8 310.0, 591.8 310.0, 604.0 310.0 C 616.2 310.0, 616.2 310.0, 628.5 310.0 C 640.8 310.0, 640.8 310.0, 653.0 310.0 C 665.2 310.0, 665.2 310.0, 677.5 310.0 C 689.8 310.0, 689.8 310.0, 702.0 310.0 C 714.2 310.0, 714.2 310.0, 726.5 310.0 C 738.8 310.0, 738.8 310.0, 751.0 310.0 C 763.2 310.0, 763.2 310.0, 775.5 310.0 C 787.8 310.0, 787.8 233.3, 800.0 233.3 L 800.0 310.0 L 65.0 310.0 Z" fill="url(#areaGradient)"/>
+      <path d="M 65.0 310.0 C 77.2 310.0, 77.2 290.8, 89.5 290.8 C 101.8 290.8, 101.8 137.5, 114.0 137.5 C 126.2 137.5, 126.2 310.0, 138.5 310.0 C 150.8 310.0, 150.8 310.0, 163.0 310.0 C 175.2 310.0, 175.2 252.5, 187.5 252.5 C 199.8 252.5, 199.8 310.0, 212.0 310.0 C 224.2 310.0, 224.2 310.0, 236.5 310.0 C 248.8 310.0, 248.8 310.0, 261.0 310.0 C 273.2 310.0, 273.2 310.0, 285.5 310.0 C 297.8 310.0, 297.8 310.0, 310.0 310.0 C 322.2 310.0, 322.2 310.0, 334.5 310.0 C 346.8 310.0, 346.8 310.0, 359.0 310.0 C 371.2 310.0, 371.2 310.0, 383.5 310.0 C 395.8 310.0, 395.8 310.0, 408.0 310.0 C 420.2 310.0, 420.2 310.0, 432.5 310.0 C 444.8 310.0, 444.8 271.7, 457.0 271.7 C 469.2 271.7, 469.2 310.0, 481.5 310.0 C 493.8 310.0, 493.8 310.0, 506.0 310.0 C 518.2 310.0, 518.2 310.0, 530.5 310.0 C 542.8 310.0, 542.8 310.0, 555.0 310.0 C 567.2 310.0, 567.2 310.0, 579.5 310.0 C 591.8 310.0, 591.8 310.0, 604.0 310.0 C 616.2 310.0, 616.2 310.0, 628.5 310.0 C 640.8 310.0, 640.8 310.0, 653.0 310.0 C 665.2 310.0, 665.2 310.0, 677.5 310.0 C 689.8 310.0, 689.8 310.0, 702.0 310.0 C 714.2 310.0, 714.2 310.0, 726.5 310.0 C 738.8 310.0, 738.8 310.0, 751.0 310.0 C 763.2 310.0, 763.2 310.0, 775.5 310.0 C 787.8 310.0, 787.8 233.3, 800.0 233.3" fill="none" stroke="url(#lineGradient)" stroke-width="2.5"/>
+      <circle cx="65.0" cy="310.0" r="2.5" fill="#30363D"/>
   <text x="65.0" y="330" text-anchor="middle" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">26 Jul</text>
-  <circle cx="89.5" cy="310.0" r="2.5" fill="#30363D"/>
-  <circle cx="114.0" cy="118.3" r="4" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
+  <circle cx="89.5" cy="290.8" r="4" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
+  <circle cx="114.0" cy="137.5" r="4" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
   <circle cx="138.5" cy="310.0" r="2.5" fill="#30363D"/>
   <text x="138.5" y="330" text-anchor="middle" fill="#FDBA74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11">29 Jul</text>
   <circle cx="163.0" cy="310.0" r="2.5" fill="#30363D"/>
