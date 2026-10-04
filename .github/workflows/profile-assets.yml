@@ -552,6 +552,9 @@ jobs:
               "set",
           }
 
+          # Zero-contribution graphs have no white point outlines.
+          optional_colors = {"activity-graph": {"#ffffff"}}
+
           failed = []
           updated = []
 
@@ -560,7 +563,7 @@ jobs:
               candidate,
               destination,
               markers,
-              expected_colors,
+              allowed_colors,
               expected_dimensions,
           ) in candidates:
               try:
@@ -747,8 +750,12 @@ jobs:
                   if missing:
                       raise ValueError(f"missing markers: {', '.join(missing)}")
 
+                  required_colors = [
+                      color for color in allowed_colors
+                      if color not in optional_colors.get(name, set())
+                  ]
                   missing_colors = [
-                      color for color in expected_colors if color not in lowered
+                      color for color in required_colors if color not in lowered
                   ]
                   if missing_colors:
                       raise ValueError(
@@ -758,13 +765,13 @@ jobs:
                   svg_colors = set(
                       re.findall(r"#[0-9a-f]{6}", lowered)
                   )
-                  unexpected_colors = sorted(
-                      svg_colors.difference(expected_colors)
+                  unallowed_colors = sorted(
+                      svg_colors.difference(allowed_colors)
                   )
 
-                  if unexpected_colors:
+                  if unallowed_colors:
                       raise ValueError(
-                          f"unexpected colors: {', '.join(unexpected_colors)}"
+                          f"unexpected colors: {', '.join(unallowed_colors)}"
                       )
 
                   def color_of(element, property_name):
@@ -908,6 +915,21 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               print(f"updated={','.join(updated)}", file=output)
               print(f"failed={','.join(failed)}", file=output)
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              print("## Profile asset refresh\n", file=summary)
+              print("| Asset | Result |", file=summary)
+              print("| --- | --- |", file=summary)
+              for name, *_ in candidates:
+                  if name in failed:
+                      status = "Preserved previous asset (candidate rejected or missing)"
+                  elif name in updated:
+                      status = "Updated"
+                  else:
+                      status = "Already current"
+                  print(f"| {name} | {status} |", file=summary)
+              if failed:
+                  print("\nPreserved assets were not refreshed. See validation warnings for details.", file=summary)
 
       - name: Remove candidates
         if: always()
